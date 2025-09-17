@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  mini-dropbox:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - SECRET_KEY=your-secret-key-here
+      - JWT_SECRET_KEY=your-jwt-secret-key-here
+      - DATABASE_URL=sqlite:///mini_dropbox.db
+      - STORAGE_PATH=./storage
+      - MAX_FILE_SIZE=104857600
+      - ALLOWED_EXTENSIONS=txt,pdf,png,jpg,jpeg,gif,doc,docx,xls,xlsx,ppt,pptx,zip,rar
+    volumes:
+      - ./storage:/app/storage
+      - ./mini_dropbox.db:/app/mini_dropbox.db
+    restart: unless-stopped
+
+  mini-dropbox-dev:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - SECRET_KEY=dev-secret-key
+      - JWT_SECRET_KEY=dev-jwt-secret-key
+      - DATABASE_URL=sqlite:///mini_dropbox.db
+      - STORAGE_PATH=./storage
+    volumes:
+      - .:/app
+      - ./storage:/app/storage
+    command: python run.py
+    restart: unless-stopped
+    profiles:
+      - dev
