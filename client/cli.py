@@ -5,6 +5,40 @@ import requests
 API_URL = os.environ.get("API_URL", "http://localhost:5000")
 TOKEN_FILE = os.path.expanduser("~/.mini_dropbox_token")
 
+'''
+
+## Add minimal CLI client and Flask backend for mini-dropbox MVP
+
+This PR sets up a minimal working Dropbox-like app using Python.
+
+**Features:**
+- CLI client with signup, login, upload, download, and list commands.
+- Flask backend exposing REST endpoints for auth and file management.
+- SQLite DB for users and file metadata (auto-initialized).
+- Local folder storage for uploaded files.
+
+**Files Added:**
+- `client/cli.py`: Python CLI implementation.
+- `services/app.py`: Flask backend implementation.
+- `services/Dockerfile`: Dockerfile for backend.
+
+**How to test:**
+1. Start backend:  
+   `cd services && python app.py`
+2. Use the CLI:  
+   `cd client && python cli.py signup yourusername yourpassword`  
+   `python cli.py login yourusername yourpassword`  
+   `python cli.py upload path/to/yourfile.txt`  
+   `python cli.py list`  
+   `python cli.py download yourfile.txt`
+
+**Notes:**  
+- No backup or metadata separation yet—just one SQLite DB in the backend and file storage in a local directory.
+- Ready for future extension (versioning, sync, redundancy).
+
+
+'''
+
 def save_token(token):
     with open(TOKEN_FILE, "w") as f:
         f.write(token)
