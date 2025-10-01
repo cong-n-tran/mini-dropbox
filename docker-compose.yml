@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  metadata:
+    build: ./metadata
+    volumes:
+      - metadata_data:/data
+    ports:
+      - "5000:5000"
+
+  storage:
+    build: ./storage
+    volumes:
+      - storage_data:/storage
+    ports:
+      - "5001:5001"
+
+  backup:
+    build: ./backup
+    volumes:
+      - metadata_data:/metadata
+      - storage_data:/storage
+      - backup_data:/backup
+
+volumes:
+  metadata_data:
+  storage_data:
+  backup_data:
