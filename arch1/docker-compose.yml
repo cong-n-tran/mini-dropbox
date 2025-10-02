@@ -1,18 +1,35 @@
 version: "3.8"
 services:
+  client:
+      build: ./client
+      depends_on:
+        - services
+      environment:
+        - API_URL=http://services:5000
+      volumes:
+        - ./client:/app
+      stdin_open: true
+      tty: true
+  services:
+    build: ./services
+    ports:
+      - "5000:5000"
+    depends_on:
+      - storage
+      - metadata
   metadata:
     build: ./metadata
     volumes:
       - metadata_data:/data
     ports:
-      - "5000:5000"
+      - "5001:5001"
 
   storage:
     build: ./storage
     volumes:
       - storage_data:/storage
     ports:
-      - "5001:5001"
+      - "5002:5002"
 
   backup:
     build: ./backup

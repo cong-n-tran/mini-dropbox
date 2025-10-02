@@ -2,105 +2,63 @@ import argparse
 import os
 import requests
 
-API_URL = os.environ.get("API_URL", "http://localhost:5000")
-TOKEN_FILE = os.path.expanduser("~/.mini_dropbox_token")
-
-'''
-
-## Add minimal CLI client and Flask backend for mini-dropbox MVP
-
-This PR sets up a minimal working Dropbox-like app using Python.
-
-**Features:**
-- CLI client with signup, login, upload, download, and list commands.
-- Flask backend exposing REST endpoints for auth and file management.
-- SQLite DB for users and file metadata (auto-initialized).
-- Local folder storage for uploaded files.
-
-**Files Added:**
-- `client/cli.py`: Python CLI implementation.
-- `services/app.py`: Flask backend implementation.
-- `services/Dockerfile`: Dockerfile for backend.
-
-**How to test:**
-1. Start backend:  
-   `cd services && python app.py`
-2. Use the CLI:  
-   `cd client && python cli.py signup yourusername yourpassword`  
-   `python cli.py login yourusername yourpassword`  
-   `python cli.py upload path/to/yourfile.txt`  
-   `python cli.py list`  
-   `python cli.py download yourfile.txt`
-
-**Notes:**  
-- No backup or metadata separation yet—just one SQLite DB in the backend and file storage in a local directory.
-- Ready for future extension (versioning, sync, redundancy).
-
-
-'''
-
-def save_token(token):
-    with open(TOKEN_FILE, "w") as f:
-        f.write(token)
-
-def load_token():
-    if os.path.exists(TOKEN_FILE):
-        with open(TOKEN_FILE) as f:
-            return f.read().strip()
-    return None
+# When running in Docker Compose, use the service name as host
+API_URL = os.environ.get("API_URL", "http://services:5000")
 
 def signup(args):
-    username = args.username
-    password = args.password
-    resp = requests.post(f"{API_URL}/auth/signup", json={"username": username, "password": password})
-    print(resp.json())
+    print("Signup not implemented yet.")
+    # Uncomment and implement when ready
+    # username = args.username
+    # password = args.password
+    # resp = requests.post(f"{API_URL}/auth/signup", json={"username": username, "password": password})
+    # print(resp.json())
 
 def login(args):
-    username = args.username
-    password = args.password
-    resp = requests.post(f"{API_URL}/auth/login", json={"username": username, "password": password})
-    data = resp.json()
-    if "token" in data:
-        save_token(data["token"])
-        print("Login successful!")
-    else:
-        print("Login failed:", data)
+    print("Login not implemented yet.")
+    # Uncomment and implement when ready
+    # username = args.username
+    # password = args.password
+    # resp = requests.post(f"{API_URL}/auth/login", json={"username": username, "password": password})
+    # data = resp.json()
+    # if "token" in data:
+    #     save_token(data["token"])
+    #     print("Login successful!")
+    # else:
+    #     print("Login failed:", data)
+
+# for debugging purposes
+def print_response(resp):
+    try:
+        print(resp.json())
+    except Exception:
+        print("Raw response:", resp.text)
+        print("Status code:", resp.status_code)
 
 def upload(args):
-    token = load_token()
-    if not token:
-        print("Please login first.")
-        return
-    fname = args.file
-    files = {'file': open(fname, 'rb')}
-    headers = {'Authorization': f"Bearer {token}"}
-    resp = requests.post(f"{API_URL}/files/upload", files=files, headers=headers)
-    print(resp.json())
-
+    file_name = args.file
+    files = {'file': open(file_name, 'rb')}
+    data = {}
+    resp = requests.post(f"{API_URL}/files/upload", files=files, data=data)
+    print_response(resp)
+    
+# not implemented yet in theory
 def download(args):
-    token = load_token()
-    if not token:
-        print("Please login first.")
-        return
-    fname = args.file
-    headers = {'Authorization': f"Bearer {token}"}
-    resp = requests.get(f"{API_URL}/files/download/{fname}", headers=headers)
+    file_name = args.file
+    resp = requests.get(f"{API_URL}/files/download/{file_name}", stream=True)
     if resp.status_code == 200:
-        outname = args.output if args.output else fname
+        outname = args.output if args.output else file_name
         with open(outname, 'wb') as f:
-            f.write(resp.content)
+            for chunk in resp.iter_content(chunk_size=8192):
+                f.write(chunk)
         print(f"Downloaded to {outname}")
     else:
-        print("Download failed:", resp.json())
+        print("Download failed:", resp.text)  # or use print_response(resp)
 
+# not implemented yet in theory
 def list_files(args):
-    token = load_token()
-    if not token:
-        print("Please login first.")
-        return
-    headers = {'Authorization': f"Bearer {token}"}
-    resp = requests.get(f"{API_URL}/files/list", headers=headers)
-    print("Files:", resp.json())
+    params = {}
+    resp = requests.get(f"{API_URL}/files/list", params=params)
+    print_response(resp)
 
 def main():
     parser = argparse.ArgumentParser(description="Mini-Dropbox CLI Client")
@@ -141,3 +99,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
