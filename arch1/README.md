@@ -54,3 +54,32 @@ Python Script: Use shutil for copying files and sqlite3 for dumping metadata.
 #### Responsibilities:
 - Periodically back up file storage and metadata DB.
 - Can be run as a cron job or a long-running Python service with scheduling.
+
+
+
+# To get it working:
+as of October 2nd, 2025
+
+### 1. run the client server and enter in via bash
+`docker-compose run client /bin/bash`
+
+### 2. run the cli.py and upload a file
+`python cli.py upload somefile.txt`
+
+you should see this `{'path': '/storage/somefile.txt', 'status': 'saved'}`
+
+### 3. open another terminal and enter the storage container
+`docker exec -it arch1-storage-1 sh `
+
+list the storage folder `ls /storage`
+
+and you should see the `somefile.txt` there. 
+
+
+### some assumptions
+- i (cong) only connected this to the storage container, i am assuming metadata and backup with work in sync already
+- i changed some portings too.
+- current it is: (i updated it in the storage and metadata code already)
+    - service - 5000
+    - metadata - 5001
+    - storage - 5002
