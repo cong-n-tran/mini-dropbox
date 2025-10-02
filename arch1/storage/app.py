@@ -6,7 +6,7 @@ STORAGE_PATH = "/storage"
 os.makedirs(STORAGE_PATH, exist_ok=True)
 
 # Metadata API URL (use service name from docker-compose)
-METADATA_API = "http://metadata:5000/files"
+METADATA_API = "http://metadata:5001/files"
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
@@ -54,4 +54,4 @@ def delete_file(filename):
     return {"status": "not found"}, 404
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    app.run(host="0.0.0.0", port=5002)
