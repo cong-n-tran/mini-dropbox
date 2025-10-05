@@ -1,7 +1,17 @@
 FROM python:3.11-slim
+
 WORKDIR /app
+
+# Install dependencies
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy app
 COPY app.py .
-VOLUME ["/data"]
+
+# Ensure data directory exists
+RUN mkdir -p /data
+
+EXPOSE 5000
+
 CMD ["python", "app.py"]
