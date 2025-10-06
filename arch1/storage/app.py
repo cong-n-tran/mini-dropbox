@@ -5,7 +5,7 @@ import requests
 app = Flask(__name__)
 
 STORAGE_PATH = "/storage"
-METADATA_API = "http://metadata:5000/files"
+METADATA_API = "http://metadata:5001/files"
 
 os.makedirs(STORAGE_PATH, exist_ok=True)
 
@@ -17,10 +17,10 @@ def upload_file():
     f = request.files["file"]
 
     # Get username/password
-    username = request.form.get("user") or request.values.get("user")
-    password = request.form.get("password") or request.values.get("password")
-    if not username or not password:
-        return jsonify({"error": "Username and password are required"}), 400
+    # username = request.form.get("user") or request.values.get("user")
+    # password = request.form.get("password") or request.values.get("password")
+    # if not username or not password:
+    #     return jsonify({"error": "Username and password are required"}), 400
 
     print("request.form:", request.form)
     print("request.files:", request.files)
@@ -40,8 +40,8 @@ def upload_file():
         "path": save_path,
         "size": size,
         "version": 1,
-        "user": username,
-        "password": password
+        # "user": username,
+        # "password": password
     }
 
     # Send metadata to metadata container
@@ -57,11 +57,11 @@ def upload_file():
 @app.route("/download", methods=["GET"])
 def download_file():
     filename = request.args.get("filename")
-    username = request.args.get("user")
-    password = request.args.get("password")
+    # username = request.args.get("user")
+    # password = request.args.get("password")
 
-    if not filename or not username or not password:
-        return jsonify({"error": "Filename, username, and password required"}), 400
+    # if not filename or not username or not password:
+    #     return jsonify({"error": "Filename, username, and password required"}), 400
 
     # Fetch metadata
     try:
@@ -72,8 +72,8 @@ def download_file():
         return jsonify({"error": f"Failed to fetch metadata: {e}"}), 404
 
     # Validate username/password
-    if username.strip() != metadata["user"].strip() or password.strip() != metadata["password"].strip():
-        return jsonify({"error": "Invalid username or password"}), 403
+    # if username.strip() != metadata["user"].strip() or password.strip() != metadata["password"].strip():
+    #     return jsonify({"error": "Invalid username or password"}), 403
 
     # Check if file exists
     file_path = metadata["path"]
@@ -86,11 +86,11 @@ def download_file():
 @app.route("/delete", methods=["DELETE"])
 def delete_file():
     filename = request.args.get("filename")
-    username = request.args.get("user")
-    password = request.args.get("password")
+    # username = request.args.get("user")
+    # password = request.args.get("password")
 
-    if not filename or not username or not password:
-        return jsonify({"error": "Filename, username, and password required"}), 400
+    # if not filename or not username or not password:
+    #     return jsonify({"error": "Filename, username, and password required"}), 400
 
     # Fetch metadata
     try:
@@ -100,9 +100,9 @@ def delete_file():
     except Exception as e:
         return jsonify({"error": f"Failed to fetch metadata: {e}"}), 404
 
-    # Validate username/password
-    if username.strip() != metadata["user"].strip() or password.strip() != metadata["password"].strip():
-        return jsonify({"error": "Invalid username or password"}), 403
+    # # Validate username/password
+    # if username.strip() != metadata["user"].strip() or password.strip() != metadata["password"].strip():
+    #     return jsonify({"error": "Invalid username or password"}), 403
 
     # Delete file
     try:
@@ -125,4 +125,4 @@ def delete_file():
 if __name__ == "__main__":
     import sys
     sys.stdout.reconfigure(line_buffering=True)  # ensure prints appear immediately
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5002, debug=True)

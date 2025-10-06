@@ -4,6 +4,7 @@ app = Flask(__name__)
 
 # In-memory metadata store
 FILES = {}
+USERS = {}
 
 # ---------------- Add / Upload Metadata ----------------
 @app.route("/files", methods=["POST"])
@@ -52,9 +53,32 @@ def delete_file(filename):
 def list_files():
     return jsonify(list(FILES.values())), 200
 
+# ---------------- User Registration ----------------
+@app.route("/users", methods=["POST"])
+def add_user():
+    data = request.get_json()
+    username = data.get("username")
+    password = data.get("password")  # This should be a hashed password
+    if not username or not password:
+        return jsonify({"error": "Missing username or password"}), 400
 
+    if username in USERS:
+        return jsonify({"error": "Username already exists"}), 409
+
+    USERS[username] = password
+    return jsonify({"message": "User created"}), 201
+
+# ---------------- Get User for Login ----------------
+@app.route("/users/<username>", methods=["GET"])
+def get_user(username):
+    if username not in USERS:
+        return jsonify({"error": "User not found"}), 404
+    return jsonify({
+        "username": username,
+        "password": USERS[username]
+    }), 200
 # ---------------- Main ----------------
 if __name__ == "__main__":
     import sys
     sys.stdout.reconfigure(line_buffering=True)  # flush prints immediately
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True)
