@@ -5,26 +5,34 @@ import requests
 # When running in Docker Compose, use the service name as host
 API_URL = os.environ.get("API_URL", "http://services:5000")
 
+TOKEN_FILE = os.path.expanduser("~/.mini_dropbox_token")
+
+def save_token(token):
+    with open(TOKEN_FILE, "w") as f:
+        f.write(token)
+
+def load_token():
+    if os.path.exists(TOKEN_FILE):
+        with open(TOKEN_FILE) as f:
+            return f.read().strip()
+    return None
+
 def signup(args):
-    print("Signup not implemented yet.")
-    # Uncomment and implement when ready
-    # username = args.username
-    # password = args.password
-    # resp = requests.post(f"{API_URL}/auth/signup", json={"username": username, "password": password})
-    # print(resp.json())
+    username = args.username
+    password = args.password
+    resp = requests.post(f"{API_URL}/auth/signup", json={"username": username, "password": password})
+    print(resp.json())
 
 def login(args):
-    print("Login not implemented yet.")
-    # Uncomment and implement when ready
-    # username = args.username
-    # password = args.password
-    # resp = requests.post(f"{API_URL}/auth/login", json={"username": username, "password": password})
-    # data = resp.json()
-    # if "token" in data:
-    #     save_token(data["token"])
-    #     print("Login successful!")
-    # else:
-    #     print("Login failed:", data)
+    username = args.username
+    password = args.password
+    resp = requests.post(f"{API_URL}/auth/login", json={"username": username, "password": password})
+    data = resp.json()
+    if "token" in data:
+        save_token(data["token"])
+        print("Login successful!")
+    else:
+        print("Login failed:", data)
 
 # for debugging purposes
 def print_response(resp):
@@ -38,13 +46,22 @@ def upload(args):
     file_name = args.file
     files = {'file': open(file_name, 'rb')}
     data = {}
-    resp = requests.post(f"{API_URL}/files/upload", files=files, data=data)
+    token = load_token()
+    headers = {}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    resp = requests.post(f"{API_URL}/files/upload", files=files, data=data, headers=headers)
     print_response(resp)
     
 # not implemented yet in theory
 def download(args):
     file_name = args.file
-    resp = requests.get(f"{API_URL}/files/download/{file_name}", stream=True)
+    token = load_token()
+    headers = {}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    params = {"filename": file_name}
+    resp = requests.get(f"{API_URL}/files/download", params=params, headers=headers, stream=True)
     if resp.status_code == 200:
         outname = args.output if args.output else file_name
         with open(outname, 'wb') as f:
@@ -55,9 +72,27 @@ def download(args):
         print("Download failed:", resp.text)  # or use print_response(resp)
 
 # not implemented yet in theory
+def delete(args):
+    file_name = args.file
+    token = load_token()
+    headers = {}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    params = {"filename": file_name}
+    resp = requests.delete(f"{API_URL}/files/delete", params=params, headers=headers)
+    if resp.status_code == 200:
+        print(f"Deletion successful")
+    else:
+        print("Delete failed:", resp.text)  # or use print_response(resp)
+
+# not implemented yet in theory
 def list_files(args):
     params = {}
-    resp = requests.get(f"{API_URL}/files/list", params=params)
+    token = load_token()
+    headers = {}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    resp = requests.get(f"{API_URL}/files", params=params, headers=headers)
     print_response(resp)
 
 def main():
@@ -90,6 +125,11 @@ def main():
     # List files
     parser_list = subparsers.add_parser("list")
     parser_list.set_defaults(func=list_files)
+
+    # Delete
+    parser_upload = subparsers.add_parser("delete")
+    parser_upload.add_argument("file")
+    parser_upload.set_defaults(func=delete)
 
     args = parser.parse_args()
     if hasattr(args, "func"):
