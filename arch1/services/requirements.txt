@@ -1,4 +1,4 @@
 flask
 werkzeug
-jwt
+PyJWT
 requests
