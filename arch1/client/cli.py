@@ -2,27 +2,32 @@ import argparse
 import os
 import requests
 
-# When running in Docker Compose, use the service name as host
+# api url for the services
 API_URL = os.environ.get("API_URL", "http://services:5000")
 
+# token file to store JWT token
 TOKEN_FILE = os.path.expanduser("~/.mini_dropbox_token")
 
+# saving the token into the TOKEN_FILE
 def save_token(token):
     with open(TOKEN_FILE, "w") as f:
         f.write(token)
 
+# loading the token from the TOKEN_FILE
 def load_token():
     if os.path.exists(TOKEN_FILE):
         with open(TOKEN_FILE) as f:
             return f.read().strip()
     return None
 
+# create a post request to sign up user
 def signup(args):
     username = args.username
     password = args.password
     resp = requests.post(f"{API_URL}/auth/signup", json={"username": username, "password": password})
     print(resp.json())
 
+# create a post request to log in user and save the token
 def login(args):
     username = args.username
     password = args.password
@@ -42,6 +47,7 @@ def print_response(resp):
         print("Raw response:", resp.text)
         print("Status code:", resp.status_code)
 
+# upload file to the storage service - requires token for auth
 def upload(args):
     file_name = args.file
     files = {'file': open(file_name, 'rb')}
@@ -53,7 +59,7 @@ def upload(args):
     resp = requests.post(f"{API_URL}/files/upload", files=files, data=data, headers=headers)
     print_response(resp)
     
-# not implemented yet in theory
+# download file from the storage service - requires token for auth
 def download(args):
     file_name = args.file
     token = load_token()
@@ -71,11 +77,11 @@ def download(args):
     else:
         print("Download failed:", resp.text)  # or use print_response(resp)
 
-# not implemented yet in theory
+# delete file from the storage service - requires token for auth
 def delete(args):
     file_name = args.file
-    token = load_token()
     headers = {}
+    token = load_token()
     if token:
         headers["Authorization"] = f"Bearer {token}"
     params = {"filename": file_name}
@@ -85,11 +91,11 @@ def delete(args):
     else:
         print("Delete failed:", resp.text)  # or use print_response(resp)
 
-# not implemented yet in theory
+# list all files from the metadata service - requires token for auth
 def list_files(args):
     params = {}
-    token = load_token()
     headers = {}
+    token = load_token()
     if token:
         headers["Authorization"] = f"Bearer {token}"
     resp = requests.get(f"{API_URL}/files", params=params, headers=headers)
