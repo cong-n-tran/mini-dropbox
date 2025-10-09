@@ -9,11 +9,10 @@ A Mini Dropbox-like Distributed File Storage System that allows users to securel
 - Only authenticated users can upload, download, or manage files.
 
 #### File Upload & Storage Distribution
-- Files are uploaded via a client API and split or assigned to storage nodes.
-- Support for multiple storage nodes for redundancy or sharding.
+- Files are uploaded via a client API to storage.
 
 #### File Retrieval & Download
-- Users can browse their files and download them from distributed storage nodes.
+- Users can browse their files and download them from storage.
 
 #### Metadata Management & Versioning
 - System keeps track of filenames, paths, versions, sizes, and modification timestamps.
