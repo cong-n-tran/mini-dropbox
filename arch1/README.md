@@ -64,13 +64,12 @@ as of October 2nd, 2025
 `docker-compose run client /bin/bash`
 
 ### 2. run the cli.py and run these commands
-`python cli.py upload somefile.txt`
-`python cli.py signup username password`
-`python cli.py login username password`
-`python cli.py upload somefile.txt`
-`python cli.py download somefile.txt`
-`python cli.py delete somefile.txt`
-`python cli.py list`
+- `python cli.py signup username password`
+- `python cli.py login username password`
+- `python cli.py upload somefile.txt`
+- `python cli.py download somefile.txt`
+- `python cli.py delete somefile.txt`
+- `python cli.py list`
 
 some responses you should see
 - signup: `{'message': 'Signup successful!'}`
