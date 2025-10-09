@@ -3,7 +3,8 @@ import os
 import requests
 
 # api url for the services
-API_URL = os.environ.get("API_URL", "http://services:5000")
+UPLOAD_URL = os.environ.get("UPLOAD_URL", "http://upload:5000")
+DOWNLOAD_URL = os.environ.get("DOWNLOAD_URL", "http://download:5003")
 
 # token file to store JWT token
 TOKEN_FILE = os.path.expanduser("~/.mini_dropbox_token")
@@ -24,14 +25,14 @@ def load_token():
 def signup(args):
     username = args.username
     password = args.password
-    resp = requests.post(f"{API_URL}/auth/signup", json={"username": username, "password": password})
+    resp = requests.post(f"{UPLOAD_URL}/auth/signup", json={"username": username, "password": password})
     print(resp.json())
 
 # create a post request to log in user and save the token
 def login(args):
     username = args.username
     password = args.password
-    resp = requests.post(f"{API_URL}/auth/login", json={"username": username, "password": password})
+    resp = requests.post(f"{UPLOAD_URL}/auth/login", json={"username": username, "password": password})
     data = resp.json()
     if "token" in data:
         save_token(data["token"])
@@ -56,7 +57,7 @@ def upload(args):
     headers = {}
     if token:
         headers["Authorization"] = f"Bearer {token}"
-    resp = requests.post(f"{API_URL}/files/upload", files=files, data=data, headers=headers)
+    resp = requests.post(f"{UPLOAD_URL}/files/upload", files=files, data=data, headers=headers)
     print_response(resp)
     
 # download file from the storage service - requires token for auth
@@ -67,7 +68,7 @@ def download(args):
     if token:
         headers["Authorization"] = f"Bearer {token}"
     params = {"filename": file_name}
-    resp = requests.get(f"{API_URL}/files/download", params=params, headers=headers, stream=True)
+    resp = requests.get(f"{DOWNLOAD_URL}/files/download", params=params, headers=headers, stream=True)
     if resp.status_code == 200:
         outname = args.output if args.output else file_name
         with open(outname, 'wb') as f:
@@ -85,7 +86,7 @@ def delete(args):
     if token:
         headers["Authorization"] = f"Bearer {token}"
     params = {"filename": file_name}
-    resp = requests.delete(f"{API_URL}/files/delete", params=params, headers=headers)
+    resp = requests.delete(f"{DOWNLOAD_URL}/files/delete", params=params, headers=headers)
     if resp.status_code == 200:
         print(f"Deletion successful")
     else:
@@ -98,7 +99,7 @@ def list_files(args):
     token = load_token()
     if token:
         headers["Authorization"] = f"Bearer {token}"
-    resp = requests.get(f"{API_URL}/files", params=params, headers=headers)
+    resp = requests.get(f"{UPLOAD_URL}/files", params=params, headers=headers)
     print_response(resp)
 
 def main():

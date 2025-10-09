@@ -3,17 +3,26 @@ services:
   client:
       build: ./client
       depends_on:
-        - services
+        - upload
+        - download
       environment:
-        - API_URL=http://services:5000
+        - UPLOAD_URL=http://upload:5000
+        - DOWNLOAD_URL=http://download:5003
       volumes:
         - ./client:/app
       stdin_open: true
       tty: true
-  services:
-    build: ./services
+  upload:
+    build: ./services/upload
     ports:
       - "5000:5000"
+    depends_on:
+      - storage
+      - metadata
+  download:
+    build: ./services/download
+    ports:
+      - "5003:5003"
     depends_on:
       - storage
       - metadata
