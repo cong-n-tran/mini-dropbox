@@ -48,7 +48,7 @@ This architecture decomposes Mini-Dropbox into smaller, independently deployable
 ## Assumptions & Notes
 
 - Minimal error handling; intended for concept demonstration.
-- Service ports: 5003 (upload), 5004 (download), 5004 (metadata), 5006 (storage), .
+- Service ports: 5003 (upload), 5004 (download), 5005 (metadata), 5006 (storage), .
 - For more details or to compare architectures, see the main [README](../README.md).
 
 ---
