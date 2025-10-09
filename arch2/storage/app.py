@@ -5,7 +5,7 @@ import requests
 app = Flask(__name__)
 
 STORAGE_PATH = "/storage"
-METADATA_API = "http://metadata:5001/files"
+METADATA_API = "http://metadata:5005/files"
 
 os.makedirs(STORAGE_PATH, exist_ok=True)
 
@@ -125,4 +125,4 @@ def delete_file():
 if __name__ == "__main__":
     import sys
     sys.stdout.reconfigure(line_buffering=True)  # ensure prints appear immediately
-    app.run(host="0.0.0.0", port=5002, debug=True)
+    app.run(host="0.0.0.0", port=5006, debug=True)

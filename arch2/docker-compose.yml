@@ -6,8 +6,8 @@ services:
         - upload
         - download
       environment:
-        - UPLOAD_URL=http://upload:5000
-        - DOWNLOAD_URL=http://download:5003
+        - UPLOAD_URL=http://upload:5003
+        - DOWNLOAD_URL=http://download:5004
       volumes:
         - ./client:/app
       stdin_open: true
@@ -15,14 +15,14 @@ services:
   upload:
     build: ./services/upload
     ports:
-      - "5000:5000"
+      - "5003:5003"
     depends_on:
       - storage
       - metadata
   download:
     build: ./services/download
     ports:
-      - "5003:5003"
+      - "5004:5004"
     depends_on:
       - storage
       - metadata
@@ -31,14 +31,14 @@ services:
     volumes:
       - metadata_data:/data
     ports:
-      - "5001:5001"
+      - "5005:5005"
 
   storage:
     build: ./storage
     volumes:
       - storage_data:/storage
     ports:
-      - "5002:5002"
+      - "5006:5006"
 
   backup:
     build: ./backup

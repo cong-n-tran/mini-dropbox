@@ -7,8 +7,8 @@ import requests, os
 
 app = Flask(__name__)
 
-STORAGE_API = "http://storage:5002" # storage service URL
-METADATA_API = "http://metadata:5001" # metadata service URL
+METADATA_API = "http://metadata:5005" # metadata service URL
+STORAGE_API = "http://storage:5006" # storage service URL
 SECRET_KEY = os.environ.get("SECRET_KEY", "supersecretkey") # secret key for JWT - in more secure setup, use env variable
 
 
@@ -86,4 +86,4 @@ def delete_file():
         return jsonify({"error": "Delete error - " + resp.text}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5003)
+    app.run(host="0.0.0.0", port=5004)

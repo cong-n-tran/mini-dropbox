@@ -3,8 +3,8 @@ import os
 import requests
 
 # api url for the services
-UPLOAD_URL = os.environ.get("UPLOAD_URL", "http://upload:5000")
-DOWNLOAD_URL = os.environ.get("DOWNLOAD_URL", "http://download:5003")
+UPLOAD_URL = os.environ.get("UPLOAD_URL", "http://upload:5003")
+DOWNLOAD_URL = os.environ.get("DOWNLOAD_URL", "http://download:5004")
 
 # token file to store JWT token
 TOKEN_FILE = os.path.expanduser("~/.mini_dropbox_token")
