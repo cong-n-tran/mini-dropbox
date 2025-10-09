@@ -1,39 +1,56 @@
 # Architecture 2 - Microservices Architecture
 
-## To get it working:
-as of October 2nd, 2025
+This architecture decomposes Mini-Dropbox into smaller, independently deployable services: upload, download, metadata, storage, backup, and client. It demonstrates a modern microservices approach to distributed file storage and management.
+
+## Overview
+
+- **Client Service:** CLI interface for users (signup, login, upload, download, delete, list).
+- **Upload/Download Services:** Handle file upload and download endpoints, interacting with metadata and storage.
+- **Metadata Service:** Centralized file metadata database.
+- **Storage Service:** File I/O and persistence.
+- **Backup Service:** Periodic backup of metadata and stored files.
 
 
-### 1. run the client server and enter in via bash
-`docker-compose run client /bin/bash`
+## Capabilities
 
-### 2. run the cli.py and run these commands
-- `python cli.py signup username password`
-- `python cli.py login username password`
-- `python cli.py upload somefile.txt`
-- `python cli.py download somefile.txt`
-- `python cli.py delete somefile.txt`
-- `python cli.py list`
+- User management and JWT-based authentication.
+- File upload/download, deletion, and listing, with permission checks.
+- Metadata versioning and file tracking.
+- Extensible multi-service deployment for scalability.
+- Automated periodic backup.
+- Docker Compose for easy orchestration.
 
-some responses you should see
-- signup: `{'message': 'Signup successful!'}`
-- login:  `Login successful!`
-- upload: `{'path': '/storage/somefile.txt', 'status': 'saved'}`
-- download: `Downloaded to somefile.txt`
-- delete: `Deletion successful` 
-- list: `[{'filename': 'somefile.txt', 'password': '', 'path': '/storage/somefile.txt', 'size': 6, 'user': None, 'version': 1}]` or `[]`
+## How to Run
 
-### (optional) 3. open another terminal and enter the storage container
-`docker exec -it arch1-storage-1 sh `
+1. Start all services:
+   ```
+   docker-compose up
+   ```
+2. Enter the client server:
+   ```
+   docker-compose run client /bin/bash
+   ```
+3. Use the CLI:
+   ```
+   python cli.py signup username password
+   python cli.py login username password
+   python cli.py upload somefile.txt
+   python cli.py download somefile.txt
+   python cli.py delete somefile.txt
+   python cli.py list
+   ```
+4. (Optional) Inspect stored files:
+   ```
+   docker exec -it arch2-storage-1 sh
+   ls /storage
+   ```
 
-list the storage folder `ls /storage`
+## Assumptions & Notes
 
-and you should see the `somefile.txt` there. 
+- Minimal error handling; intended for concept demonstration.
+- Service ports: 5000 (upload), 5001 (metadata), 5002 (storage), 5003 (download).
+- For more details or to compare architectures, see the main [README](../README.md).
 
+---
 
-### some assumptions
-- no real error handling were made when creating this project. we just hope everything worked as intented lol. 
-- current it is: (i updated it in the storage and metadata code already)
-    - service - 5000
-    - metadata - 5001
-    - storage - 5002
+_This architecture is part of the Mini-Dropbox CSE 5406-004 project._

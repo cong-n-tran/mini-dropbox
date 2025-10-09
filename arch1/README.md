@@ -1,38 +1,57 @@
 # Architecture 1 - Layered Architecture
 
-## To get it working:
-as of October 2nd, 2025
+This architecture implements a classic layered design with clear separation between client, service/API backend, metadata, storage, and backup layers. It is part of the Mini-Dropbox project and demonstrates end-to-end file storage, retrieval, and management using a monolithic service API.
 
-### 1. run the client server and enter in via bash
-`docker-compose run client /bin/bash`
+## Overview
 
-### 2. run the cli.py and run these commands
-- `python cli.py signup username password`
-- `python cli.py login username password`
-- `python cli.py upload somefile.txt`
-- `python cli.py download somefile.txt`
-- `python cli.py delete somefile.txt`
-- `python cli.py list`
+- **Client Layer:** Provides a CLI interface for user operations: signup, login, upload, download, delete, list.
+- **Service Layer:** Handles authentication/authorization, and routes requests to storage and metadata layers.
+- **Metadata Layer:** Stores file metadata (filename, size, version, user, timestamps) in a dedicated container.
+- **Storage Layer:** Manages file I/O (save, fetch, delete) using a mounted volume/directory.
+- **Backup Layer:** Periodically creates backups of metadata and stored files.
 
-some responses you should see
-- signup: `{'message': 'Signup successful!'}`
-- login:  `Login successful!`
-- upload: `{'path': '/storage/somefile.txt', 'status': 'saved'}`
-- download: `Downloaded to somefile.txt`
-- delete: `Deletion successful` 
-- list: `[{'filename': 'somefile.txt', 'password': '', 'path': '/storage/somefile.txt', 'size': 6, 'user': None, 'version': 1}]` or `[]`
+## Capabilities
 
-### (optional) 3. open another terminal and enter the storage container
-`docker exec -it arch1-storage-1 sh `
+- Secure user authentication and JWT-based authorization.
+- Upload/download for any file type, with permissions enforced per user.
+- File listing and deletion.
+- Centralized metadata management for all files.
+- Versioning: metadata tracks file versions and changes.
+- Persistent storage and periodic backup to guard against data loss.
+- Extensible to multiple storage nodes.
 
-list the storage folder `ls /storage`
+## How to Run
 
-and you should see the `somefile.txt` there. 
+1. Start containers:  
+   ```
+   docker-compose up
+   ```
+2. Enter the client server:  
+   ```
+   docker-compose run client /bin/bash
+   ```
+3. Use the CLI to run commands:  
+   ```
+   python cli.py signup username password
+   python cli.py login username password
+   python cli.py upload somefile.txt
+   python cli.py download somefile.txt
+   python cli.py delete somefile.txt
+   python cli.py list
+   ```
+4. (Optional) Inspect stored files:  
+   ```
+   docker exec -it arch1-storage-1 sh
+   ls /storage
+   ```
 
+## Assumptions & Notes
 
-### some assumptions
-- no real error handling were made when creating this project. we just hope everything worked as intented lol. 
-- current it is: (i updated it in the storage and metadata code already)
-    - service - 5000
-    - metadata - 5001
-    - storage - 5002
+- Minimal error handling; focus is on architectural demonstration.
+- Service ports: 5000 (service), 5001 (metadata), 5002 (storage).
+- For details on backup and container structure, refer to the project root and backup documentation.
+- For overall project context, see the main [README](../README.md).
+
+---
+
+_This architecture is part of the Mini-Dropbox CSE 5406-004 project._
